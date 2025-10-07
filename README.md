@@ -1,36 +1,157 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Next.js DevOps Assessment
 
-## Getting Started
+Containerized Next.js application deployed using Docker, GitHub Actions, and Kubernetes (Minikube).
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 📋 Project Structure
+```
+nextjs-devops-assessment/
+├── .github/workflows/docker-build-push.yml
+├── k8s/
+│ ├── deployment.yaml
+│ └── service.yaml
+├── app/
+├── public/
+├── Dockerfile
+├── .dockerignore
+└── README.md
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Setup Instructions
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Prerequisites
+- **Node.js 18+**
+- **Docker**
+- **Minikube** (for local Kubernetes)
+- **kubectl**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 1. Clone Repository
+```bash
+git clone https://github.com/biswajit-70/nextjs-devops-assessment.git
+cd nextjs-devops-assessment
+```
+### 2. Local Development
+```bash
+# Install dependencies
+npm install
+```
+### Run development server
+```
+npm run dev
+```
+Access: http://localhost:3000
 
-## Learn More
+### 3. Docker Build & Run
+bash
+Build image
+```
+docker build -t nextjs-app .
+```
+### Run container
+```
+docker run -d -p 3000:3000 nextjs-app
+```
+Access: http://localhost:3000
 
-To learn more about Next.js, take a look at the following resources:
+## ⚙️ Deployment Steps for Minikube
+### 1. Start Minikube Cluster
+```bash
+minikube start --driver=docker
+minikube status
+kubectl get nodes
+```
+### 2. Deploy Application
+### Apply Kubernetes manifests
+```
+kubectl apply -f k8s/
+```
+### Verify deployment
+```
+kubectl get deployments, pods, services
+```
+### 3. Check Status
+```
+kubectl get pods -w
+```
+### View logs
+```
+kubectl logs -l app=nextjs-app
+```
+### Detailed info
+```
+kubectl describe deployment nextjs-app
+```
+## 🌐 How to Access Deployed Application
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Method 1: Minikube Service (Recommended)
+```bash
+minikube service nextjs-service --url
+# Output: http://192.168.49.2:32415
+```
+- Method 2: Port Forwarding
+```bash
+kubectl port-forward service/nextjs-service 8080:80
+```
+Access: http://localhost:8080
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Method 3: Direct Access
+```bash
+kubectl get service nextjs-service
+# Use NodePort with Minikube IP
+```
+## 🔄 CI/CD Pipeline
+Automated on push to main branch:
 
-## Deploy on Vercel
+- ✅ Builds Docker image
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- ✅ Pushes to GitHub Container Registry
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- ✅ Tags: latest + commit SHA
+
+Image Location: ghcr.io/biswajit-70/nextjs-app:latest
+
+### 🛠️ Useful Commands
+Kubernetes Management
+```bash
+# Scale application
+kubectl scale deployment nextjs-app --replicas=3
+```
+-  View all resources
+```
+kubectl get all
+```
+
+```bash
+# Check pod issues
+kubectl describe pod <pod-name>
+```
+-  View service details
+```
+kubectl describe service nextjs-service
+```
+- Restart Minikube
+```
+minikube stop && minikube start
+```
+## ✅ Verification Steps
+Local: ```npm run dev``` → http://localhost:3000
+
+Docker: ```docker run -d -p 3000:3000 nextjs-app``` → http://localhost:3000
+
+Kubernetes: ```minikube service nextjs-service --url``` → Access via provided URL
+
+## 🧹 Cleanup
+-  Delete resources
+```
+kubectl delete -f k8s/
+```
+- Stop Minikube
+```
+minikube stop
+```
+-  Delete cluster
+```
+minikube delete
+```
+
+- Repository: https://github.com/biswajit-70/nextjs-devops-assessment
+- Container Image: ghcr.io/biswajit-70/nextjs-app:latest
